@@ -548,7 +548,7 @@ export default function App() {
                 <div className="absolute top-0 right-0 w-[220px] h-[220px] bg-[#c9a86a]/20 blur-[30px] rounded-full" />
                 <div className="relative">
                   <div className="flex items-center gap-3">
-                    <div className="h-11 rounded-[12px] bg-white grid place-items-center px-2.5"><LogoMark className="h-6 w-auto" /></div>
+                    <div className="h-11 rounded-[12px] bg-white grid place-items-center px-2.5"><LogoMark className="h-6 w-auto text-[#0f2c4d]" /></div>
                     <div>
                       <div className="font-bold tracking-[0.12em] text-[13px]">WHITELINE UNIFORMS</div>
                       <div className="text-[11px] tracking-[0.16em] opacity-60">STITCHING TRUST, WEARING EXCELLENCE</div>
