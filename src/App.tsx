@@ -7,14 +7,20 @@ import {
   MessageCircle, Quote, Users, Building2, Award
 } from 'lucide-react';
 
-// Brand mark: three slanted bars + W (White Line logo)
+// Brand mark: three slanted bars + W. The W is a thick zigzag whose first
+// (pre-shear vertical) segment renders parallel to the bars under skewX,
+// so the third bar merges into the W as one continuous shape.
 const LogoMark = ({ className }: { className?: string }) => (
-  <svg viewBox="0 0 104 40" className={className} aria-hidden="true">
-    <g transform="skewX(-15)" fill="currentColor">
-      <rect x="12" y="0" width="8" height="40" />
-      <rect x="25" y="0" width="8" height="40" />
-      <rect x="38" y="0" width="8" height="40" />
-      <path d="M52 0 L62 40 L72 14 L82 40 L92 0" fill="none" stroke="currentColor" strokeWidth="8" />
+  <svg viewBox="0 0 84 40" className={className} aria-hidden="true">
+    <g transform="skewX(-15)">
+      <rect x="12" y="0" width="8" height="40" fill="currentColor" />
+      <rect x="25" y="0" width="8" height="40" fill="currentColor" />
+      <path
+        d="M38 0 L48 40 L58 12 L68 40 L78 0"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="8"
+      />
     </g>
   </svg>
 );
