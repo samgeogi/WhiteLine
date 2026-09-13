@@ -291,7 +291,7 @@ export default function App() {
       <section id="about" className="bg-[#f8f9fb] border-t border-[#0f2c4d]/5">
         <div className="mx-auto max-w-[1240px] px-5 md:px-8 py-16 md:py-24">
           <div className="grid md:grid-cols-[0.9fr_1.1fr] gap-10 md:gap-16 items-start">
-            <div className="sticky top-28">
+            <div className="md:sticky md:top-28">
               <div className="text-[11px] font-bold tracking-[0.18em] opacity-50">ABOUT WHITELINE</div>
               <h2 className="serif mt-3 text-[34px] md:text-[42px] leading-[0.95] tracking-[-0.02em]">Crafting Uniforms<br/>That Define Identity</h2>
               <div className="mt-8 rounded-[18px] bg-white border border-[#0f2c4d]/10 p-5 flex gap-3">
