@@ -11,7 +11,7 @@ import {
 // (pre-shear vertical) segment renders parallel to the bars under skewX,
 // so the third bar merges into the W as one continuous shape.
 const LogoMark = ({ className }: { className?: string }) => (
-  <svg viewBox="0 0 84 40" className={className} aria-hidden="true">
+  <svg viewBox="0 0 84 44" className={className} aria-hidden="true">
     <g transform="skewX(-15)">
       <rect x="12" y="0" width="8" height="40" fill="currentColor" />
       <rect x="25" y="0" width="8" height="40" fill="currentColor" />
@@ -20,6 +20,7 @@ const LogoMark = ({ className }: { className?: string }) => (
         fill="none"
         stroke="currentColor"
         strokeWidth="8"
+        strokeLinejoin="bevel"
       />
     </g>
   </svg>
