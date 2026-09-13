@@ -548,7 +548,7 @@ export default function App() {
                 <div className="absolute top-0 right-0 w-[220px] h-[220px] bg-[#c9a86a]/20 blur-[30px] rounded-full" />
                 <div className="relative">
                   <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-[12px] bg-white grid place-items-center p-2"><LogoMark className="h-full w-auto text-[#0f2c4d]" /></div>
+                    <div className="h-11 rounded-[12px] bg-white grid place-items-center px-2.5"><LogoMark className="h-6 w-auto" /></div>
                     <div>
                       <div className="font-bold tracking-[0.12em] text-[13px]">WHITELINE UNIFORMS</div>
                       <div className="text-[11px] tracking-[0.16em] opacity-60">STITCHING TRUST, WEARING EXCELLENCE</div>
@@ -617,7 +617,7 @@ export default function App() {
           <div className="grid md:grid-cols-[1.2fr_0.8fr_0.8fr] gap-10">
             <div>
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-[10px] bg-white grid place-items-center p-1.5"><LogoMark className="h-full w-auto text-[#0f2c4d]" /></div>
+                <div className="h-10 rounded-[10px] bg-white grid place-items-center px-2"><LogoMark className="h-[22px] w-auto text-[#0f2c4d]" /></div>
                 <div>
                   <div className="font-bold text-[14px] tracking-[0.14em]">WHITELINE UNIFORMS</div>
                   <div className="text-[10px] tracking-[0.2em] opacity-50">ANGAMALY • KERALA</div>
