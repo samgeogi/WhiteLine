@@ -7,6 +7,29 @@ import {
   MessageCircle, Quote, Users, Building2, Award
 } from 'lucide-react';
 
+// Brand mark: three slanted bars + W (White Line logo)
+const LogoMark = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 104 40" className={className} aria-hidden="true">
+    <g transform="skewX(-15)" fill="currentColor">
+      <rect x="12" y="0" width="8" height="40" />
+      <rect x="25" y="0" width="8" height="40" />
+      <rect x="38" y="0" width="8" height="40" />
+      <path d="M52 0 L62 40 L72 14 L82 40 L92 0" fill="none" stroke="currentColor" strokeWidth="8" />
+    </g>
+  </svg>
+);
+
+// Logo lockup: mark + wordmark
+const LogoLockup = ({ markClass, titleClass, subClass, title, sub }: { markClass: string; titleClass: string; subClass: string; title: string; sub: string }) => (
+  <div className="flex items-center gap-3">
+    <LogoMark className={markClass} />
+    <div className="leading-[1]">
+      <div className={titleClass}>{title}</div>
+      <div className={subClass}>{sub}</div>
+    </div>
+  </div>
+);
+
 export default function App() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -118,7 +141,7 @@ export default function App() {
       <header className={`fixed top-0 w-full z-50 transition-all ${scrolled ? 'bg-white/95 backdrop-blur-xl shadow-[0_8px_30px_rgba(15,44,77,0.08)] py-3' : 'bg-white py-4 border-b border-[#0f2c4d]/[0.06]'}`}>
         <div className="mx-auto max-w-[1240px] px-5 md:px-8 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-[10px] bg-[#0f2c4d] flex items-center justify-center text-white font-bold text-[16px] tracking-[-0.02em]">W</div>
+            <LogoMark className="h-7 w-auto text-[#0f2c4d]" />
             <div className="leading-[1]">
               <div className="font-bold text-[15px] tracking-[0.14em]">WHITELINE</div>
               <div className="text-[10px] tracking-[0.22em] opacity-60 font-semibold -mt-[1px]">UNIFORMS</div>
@@ -518,7 +541,7 @@ export default function App() {
                 <div className="absolute top-0 right-0 w-[220px] h-[220px] bg-[#c9a86a]/20 blur-[30px] rounded-full" />
                 <div className="relative">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-[12px] bg-white text-[#0f2c4d] grid place-items-center font-bold">W</div>
+                    <div className="w-11 h-11 rounded-[12px] bg-white grid place-items-center p-2"><LogoMark className="h-full w-auto text-[#0f2c4d]" /></div>
                     <div>
                       <div className="font-bold tracking-[0.12em] text-[13px]">WHITELINE UNIFORMS</div>
                       <div className="text-[11px] tracking-[0.16em] opacity-60">STITCHING TRUST, WEARING EXCELLENCE</div>
@@ -587,7 +610,7 @@ export default function App() {
           <div className="grid md:grid-cols-[1.2fr_0.8fr_0.8fr] gap-10">
             <div>
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-[10px] bg-white text-[#0f2c4d] grid place-items-center font-bold">W</div>
+                <div className="w-10 h-10 rounded-[10px] bg-white grid place-items-center p-1.5"><LogoMark className="h-full w-auto text-[#0f2c4d]" /></div>
                 <div>
                   <div className="font-bold text-[14px] tracking-[0.14em]">WHITELINE UNIFORMS</div>
                   <div className="text-[10px] tracking-[0.2em] opacity-50">ANGAMALY • KERALA</div>
