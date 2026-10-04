@@ -1,6 +1,5 @@
 // Layered SVG garment with volumetric shading: backdrop + floor shadow behind, shaded shirt in front.
 const SHIRT_PATH = 'm191 77-59 23-62 88 57 39 31-41-5 196q88 17 176 0l-5-196 31 41 57-39-62-88-59-23Z';
-const HANGER_PATH = 'M240 42v-8c0-13 19-14 19-2 0 7-10 10-15 13l-91 42h174l-83-42';
 
 export default function ShirtArt() {
   return (
@@ -61,11 +60,6 @@ export default function ShirtArt() {
             <stop offset=".6" stopColor="#c9a86a" />
             <stop offset="1" stopColor="#8a6a32" />
           </radialGradient>
-          <linearGradient id="hanger-metal" x1="0" y1="0" x2="1" y2="1">
-            <stop stopColor="#e2c58c" />
-            <stop offset=".5" stopColor="#aa8a57" />
-            <stop offset="1" stopColor="#7a5c2e" />
-          </linearGradient>
           <pattern id="fabric-weave" width="5" height="5" patternUnits="userSpaceOnUse">
             <path d="M0 0h5M0 0v5" stroke="#fff" strokeOpacity=".055" strokeWidth=".6" />
           </pattern>
@@ -80,10 +74,6 @@ export default function ShirtArt() {
           </filter>
           <clipPath id="shirt-clip"><path d={SHIRT_PATH} /></clipPath>
         </defs>
-        {/* Hanger */}
-        <path d={HANGER_PATH} fill="none" stroke="url(#hanger-metal)" strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round" />
-        <path d={HANGER_PATH} fill="none" stroke="#fff" strokeOpacity=".35" strokeWidth="1" strokeLinecap="round" strokeDasharray="30 400" />
-
         <g filter="url(#garment-shadow)">
           {/* Body: base colour, weave, vertical falloff, chest highlight */}
           <path d={SHIRT_PATH} fill="url(#shirt-body)" />
