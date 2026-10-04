@@ -1,47 +1,108 @@
-// An original garment illustration: no external image requests or stock photography.
+import { useEffect, useRef, useState } from 'react';
+import ShirtArt from './ShirtArt';
+
+// An original garment illustration with layered depth: no external image requests or stock photography.
+// The shirt sits on a perspective stage that tilts with the pointer; numbered hotspots explain the stitching.
+
+export type StitchFeature = {
+  id: string;
+  n: string;
+  x: number; // viewBox coordinates (0-480)
+  y: number; // viewBox coordinates (0-440)
+  title: string;
+  spec: string;
+  desc: string;
+};
+
+export const stitchFeatures: StitchFeature[] = [
+  { id: 'yoke', n: '01', x: 196, y: 92, title: 'Reinforced shoulder yoke', spec: 'Double-needle · 10–12 stitches per inch',
+    desc: 'Shoulders carry bag straps and daily tugging, so every yoke is double-stitched with a second parallel row. Seam allowances are overlocked inside, so nothing frays in the wash.' },
+  { id: 'collar', n: '02', x: 262, y: 84, title: 'Fused, top-stitched collar', spec: 'Interlined collar · Edge-stitched',
+    desc: 'The collar is fused with a woven interlining before stitching, so it keeps its shape after hundreds of washes. Edge-stitching stops the points from curling in Kerala humidity.' },
+  { id: 'pocket', n: '03', x: 292, y: 190, title: 'In-house embroidered crest', spec: 'Computerised embroidery · Bar-tacked corners',
+    desc: 'Your institution’s logo, house badge or name is embroidered on our own machines, not printed, so it never peels. Pocket corners are bar-tacked where fingers pull every day.' },
+  { id: 'seam', n: '04', x: 158, y: 196, title: 'Bar-tacked stress points', spec: 'Underarm & side seams · Twin-stitched',
+    desc: 'Underarms and side seams take the most strain when a student raises a hand or a nurse lifts a patient. We twin-stitch these seams and add bar-tacks at every junction.' },
+  { id: 'placket', n: '05', x: 243, y: 290, title: 'Front placket & buttons', spec: 'Cross-stitched buttons · Thread shank',
+    desc: 'Buttons are machine-attached with a cross stitch and a thread shank, so they do not pop off on the first morning. Buttonholes are cut after stitching for a clean, fray-free edge.' },
+  { id: 'hem', n: '06', x: 240, y: 376, title: 'Pre-shrunk, folded hem', spec: 'Colour-fast · Low-shrink mills-direct fabric',
+    desc: 'Fabric is sourced mills-direct and tested for shrinkage and colour-fastness before cutting. A clean folded hem keeps the length true, and every piece passes a 3-stage quality check before pressing and packing.' },
+];
+
 export default function UniformIllustration() {
+  const [active, setActive] = useState(0);
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+  const stageRef = useRef<HTMLDivElement>(null);
+  const canTilt = useRef(false);
+
+  useEffect(() => {
+    const fine = window.matchMedia('(hover: hover) and (pointer: fine)');
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const update = () => {
+      canTilt.current = fine.matches && !reduced.matches;
+      if (!canTilt.current) setTilt({ x: 0, y: 0 });
+    };
+    update();
+    fine.addEventListener('change', update);
+    reduced.addEventListener('change', update);
+    return () => { fine.removeEventListener('change', update); reduced.removeEventListener('change', update); };
+  }, []);
+
+  const onPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (!canTilt.current || !stageRef.current) return;
+    const rect = stageRef.current.getBoundingClientRect();
+    const px = (event.clientX - rect.left) / rect.width - 0.5;
+    const py = (event.clientY - rect.top) / rect.height - 0.5;
+    setTilt({ x: -py * 14, y: px * 18 });
+  };
+
+  const feature = stitchFeatures[active];
+
   return (
     <div className="uniform-visual">
       <div className="uniform-visual-heading">
         <span>THE WHITELINE STANDARD</span>
         <span>EST. 2014</span>
       </div>
-      <svg viewBox="0 0 480 440" role="img" aria-labelledby="uniform-title" className="uniform-art">
-        <title id="uniform-title">Illustrated navy uniform shirt with tailored collar, pocket and embroidered Whiteline mark</title>
-        <defs>
-          <linearGradient id="shirt-fabric" x1="0" y1="0" x2="1" y2="1">
-            <stop stopColor="#294965" />
-            <stop offset="1" stopColor="#0d263e" />
-          </linearGradient>
-          <pattern id="fabric-weave" width="5" height="5" patternUnits="userSpaceOnUse">
-            <path d="M0 0h5M0 0v5" stroke="#fff" strokeOpacity=".055" strokeWidth=".6" />
-          </pattern>
-          <filter id="garment-shadow" x="-30%" y="-20%" width="160%" height="160%">
-            <feDropShadow dx="0" dy="16" stdDeviation="13" floodColor="#102c45" floodOpacity=".18" />
-          </filter>
-        </defs>
-        <circle cx="240" cy="211" r="170" fill="none" stroke="#c9b99f" strokeOpacity=".45" />
-        <circle cx="240" cy="211" r="143" fill="none" stroke="#c9b99f" strokeOpacity=".25" />
-        <path d="M240 42v-8c0-13 19-14 19-2 0 7-10 10-15 13l-91 42h174l-83-42" fill="none" stroke="#aa8a57" strokeWidth="3" strokeLinecap="round" />
-        <g filter="url(#garment-shadow)">
-          <path d="m191 77-59 23-62 88 57 39 31-41-5 196q88 17 176 0l-5-196 31 41 57-39-62-88-59-23Z" fill="url(#shirt-fabric)" />
-          <path d="m191 77-59 23-62 88 57 39 31-41-5 196q88 17 176 0l-5-196 31 41 57-39-62-88-59-23Z" fill="url(#fabric-weave)" />
-          <path d="m191 77 49 34 51-34-17-14h-65Z" fill="#0a2035" />
-          <path d="m209 63 31 48-32 30-25-56ZM274 63l-34 48 33 30 27-56Z" fill="#36546e" stroke="#61768a" strokeWidth=".7" />
-          <path d="M240 112v282" stroke="#678097" strokeOpacity=".45" />
-          <path d="M247 113v280M158 189l-4 188M324 189l4 188M78 184l51 35M352 219l51-35" fill="none" stroke="#b9c8d3" strokeOpacity=".3" strokeDasharray="2 4" />
-          <path d="M269 174h46v44l-23 12-23-12Z" fill="#1c3853" stroke="#6b8295" strokeWidth=".8" />
-          <path d="M269 181h46" stroke="#6b8295" strokeWidth=".8" />
-          <g fill="#c9a86a">
-            {[153, 198, 243, 288, 333, 378].map(y => <circle key={y} cx="243.5" cy={y} r="2.2" />)}
-          </g>
-          <path d="m279 198-3 12m9-12-3 12m9-12 1 12 5-8 1 8 5-12" fill="none" stroke="#c9a86a" strokeWidth="2.5" />
-          <path d="M155 377q87 15 172 0" fill="none" stroke="#94a7b7" strokeOpacity=".4" strokeDasharray="2 4" />
-        </g>
-        <path d="M307 156h73m-190 158H91" stroke="#aa8a57" strokeWidth="1" />
-        <circle cx="307" cy="156" r="3" fill="#aa8a57" />
-        <circle cx="190" cy="314" r="3" fill="#aa8a57" />
-      </svg>
+
+      <div ref={stageRef} className="uniform-stage" onPointerMove={onPointerMove} onPointerLeave={() => setTilt({ x: 0, y: 0 })}>
+        <div className="uniform-stage-3d" style={{ transform: `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)` }}>
+          <ShirtArt />
+          <div className="uniform-layer uniform-layer-hotspots">
+            {stitchFeatures.map((f, i) => (
+              <button
+                key={f.id}
+                type="button"
+                className={`stitch-hotspot${i === active ? ' is-active' : ''}`}
+                style={{ left: `${(f.x / 480) * 100}%`, top: `${(f.y / 440) * 100}%` }}
+                onClick={() => setActive(i)}
+                onMouseEnter={() => setActive(i)}
+                onFocus={() => setActive(i)}
+                aria-pressed={i === active}
+                aria-label={`${f.n}: ${f.title}`}
+                aria-describedby="stitch-detail"
+              >
+                <span aria-hidden="true">{f.n}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="stitch-detail" id="stitch-detail" role="region" aria-live="polite" aria-label="Stitching feature detail">
+        <div className="stitch-detail-head">
+          <span className="stitch-detail-n">{feature.n}</span>
+          <div>
+            <h3>{feature.title}</h3>
+            <div className="stitch-detail-spec">{feature.spec}</div>
+          </div>
+        </div>
+        <p>{feature.desc}</p>
+        <div className="stitch-detail-nav" aria-hidden="true">
+          {stitchFeatures.map((f, i) => <span key={f.id} className={i === active ? 'is-active' : ''} />)}
+        </div>
+      </div>
+
       <div className="uniform-visual-footer">
         <div><span className="visual-eyebrow">CONSIDERED IN EVERY DETAIL</span><p>Quality you can feel.<br />An identity you can wear.</p></div>
         <div className="fabric-palette" aria-label="Navy, white and khaki fabric palette"><span /><span /><span /></div>

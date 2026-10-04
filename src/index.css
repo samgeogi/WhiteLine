@@ -51,6 +51,27 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .uniform-visual { border: 1px solid #e3ded3; border-radius: 16px; background: #eeeae1; overflow: hidden; box-shadow: 0 24px 64px -40px #0f2c4d66; }
 .uniform-visual-heading { display: flex; justify-content: space-between; gap: 12px; padding: 24px 28px 0; font-size: 9px; font-weight: 600; letter-spacing: .16em; color: #6e665b; }
 .uniform-art { display: block; width: 100%; height: auto; }
+.uniform-stage { position: relative; perspective: 1100px; padding: 4px 16px 0; touch-action: pan-y; }
+.uniform-stage-3d { position: relative; aspect-ratio: 480 / 440; transform-style: preserve-3d; transition: transform .35s cubic-bezier(.2,.7,.2,1); will-change: transform; }
+.uniform-layer { position: absolute; inset: 0; }
+.uniform-layer-back { transform: translateZ(-70px) scale(1.06); }
+.uniform-layer-shirt { transform: translateZ(10px); filter: drop-shadow(0 30px 24px #0f2c4d26); }
+.uniform-layer-hotspots { transform: translateZ(50px); pointer-events: none; }
+.stitch-hotspot { position: absolute; width: 30px; height: 30px; margin: -15px 0 0 -15px; padding: 0; border-radius: 50%; border: 1.5px solid #c9a86a; background: #fffdf8f0; color: #0f2c4d; font-size: 9.5px; font-weight: 700; letter-spacing: .04em; display: grid; place-items: center; cursor: pointer; pointer-events: auto; box-shadow: 0 4px 14px #0f2c4d33; transition: transform .25s, background .25s, color .25s; }
+#home .stitch-hotspot { min-height: 0; border-radius: 50%; }
+.stitch-hotspot::after { content: ''; position: absolute; inset: -8px; border-radius: 50%; border: 1px solid #c9a86a; opacity: 0; transition: opacity .25s, transform .25s; }
+.stitch-hotspot:hover, .stitch-hotspot.is-active { background: #0f2c4d; color: #f3e2b8; transform: scale(1.12); }
+.stitch-hotspot.is-active::after { opacity: .8; animation: hotspot-pulse 1.8s ease-out infinite; }
+@keyframes hotspot-pulse { 0% { transform: scale(.7); opacity: .9; } 100% { transform: scale(1.4); opacity: 0; } }
+.stitch-detail { margin: 12px 28px 22px; padding: 18px 20px 16px; border-radius: 12px; background: #fffdf8; border: 1px solid #e3ded3; min-height: 168px; box-shadow: inset 0 1px 0 #fff; }
+.stitch-detail-head { display: flex; gap: 14px; align-items: flex-start; }
+.stitch-detail-n { flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%; background: #0f2c4d; color: #f3e2b8; display: grid; place-items: center; font-size: 11px; font-weight: 700; }
+.stitch-detail h3 { font-family: 'Instrument Serif', Georgia, serif; font-size: 22px; line-height: 1.1; color: #0f2c4d; margin: 0; letter-spacing: -.01em; }
+.stitch-detail-spec { margin-top: 5px; font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #8a6f42; }
+#home .stitch-detail p { margin-top: 12px; font-size: 13.5px; line-height: 1.7; color: #4f5d6b; }
+.stitch-detail-nav { display: flex; gap: 6px; margin-top: 14px; }
+.stitch-detail-nav span { height: 3px; flex: 1; border-radius: 2px; background: #e3ded3; transition: background .25s; }
+.stitch-detail-nav span.is-active { background: #c9a86a; }
 .uniform-visual-footer { padding: 0 28px 24px; display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; }
 .visual-eyebrow { font-size: 9px; font-weight: 600; letter-spacing: .12em; color: #76664d; }
 #home .uniform-visual-footer p { font-family: 'Instrument Serif', Georgia, serif; color: #0f2c4d; font-size: 27px; line-height: 1.15; margin-top: 8px; }
@@ -115,6 +136,10 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   #about > div, #products > div, #why > div:last-child, #contact > div { padding-block: 60px; }
   .uniform-visual-heading { padding-inline: 20px; font-size: 8px; }
   .uniform-visual-footer { padding-inline: 20px; }
+  .uniform-stage { padding-inline: 6px; }
+  .stitch-hotspot { width: 34px; height: 34px; margin: -17px 0 0 -17px; font-size: 10px; }
+  .stitch-detail { margin: 8px 16px 18px; padding: 16px; min-height: 0; }
+  .stitch-detail h3 { font-size: 20px; }
   .quote-form { padding: 20px; }
   .contact-card { padding: 24px; }
   #why .text-\[26px\] { font-size: 23px; }
@@ -123,4 +148,6 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation: none !important; transition: none !important; }
   .product-card:hover { transform: none; }
+  .uniform-stage-3d { transform: none !important; }
+  .stitch-hotspot.is-active::after { opacity: .8; transform: scale(1); }
 }
