@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import UniformIllustration from './UniformIllustration';
 import { 
   Shirt, GraduationCap, Factory, Stethoscope, 
   HeartHandshake, Sparkles, Check, Scissors, PackageCheck, 
-  Clock3, Layers, Ruler, BadgeCheck, 
+  Clock3, Layers, BadgeCheck,
   Phone, MapPin, Menu, X, ArrowRight, 
   MessageCircle, Quote, Users, Building2, Award
 } from 'lucide-react';
@@ -26,17 +27,6 @@ const LogoMark = ({ className }: { className?: string }) => (
   </svg>
 );
 
-// Logo lockup: mark + wordmark
-const LogoLockup = ({ markClass, titleClass, subClass, title, sub }: { markClass: string; titleClass: string; subClass: string; title: string; sub: string }) => (
-  <div className="flex items-center gap-3">
-    <LogoMark className={markClass} />
-    <div className="leading-[1]">
-      <div className={titleClass}>{title}</div>
-      <div className={subClass}>{sub}</div>
-    </div>
-  </div>
-);
-
 export default function App() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -46,11 +36,37 @@ export default function App() {
     name: '', institution: '', phone: '', type: 'School Uniforms', quantity: '', message: ''
   });
 
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', onScroll);
+    const onScroll = () => {
+      setScrolled(window.scrollY > 20);
+      const sections = ['home', 'about', 'products', 'why', 'contact'];
+      const current = sections.filter(id => (document.getElementById(id)?.getBoundingClientRect().top ?? Infinity) <= 160).pop();
+      if (current) setActiveId(current);
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setMobileOpen(false);
+        menuButtonRef.current?.focus();
+      }
+    };
+    const desktop = window.matchMedia('(min-width: 1024px)');
+    const closeOnDesktop = () => { if (desktop.matches) setMobileOpen(false); };
+    window.addEventListener('keydown', onKeyDown);
+    desktop.addEventListener('change', closeOnDesktop);
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+      desktop.removeEventListener('change', closeOnDesktop);
+    };
+  }, [mobileOpen]);
 
   useEffect(() => {
     if (toast) {
@@ -64,7 +80,7 @@ export default function App() {
     try {
       history.replaceState(null, '', `#${id}`);
     } catch {}
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document.getElementById(id)?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
     setMobileOpen(false);
   };
 
@@ -94,7 +110,7 @@ export default function App() {
     }
     const message = `Hi Whiteline Uniforms,\nName: ${name}\nInstitution: ${institution}\nPhone: ${phoneRaw}\nUniform Type: ${form.type}\nQuantity: ${quantity}\nMessage: ${form.message.trim() || 'N/A'}`;
     const url = `https://wa.me/919249279111?text=${encodeURIComponent(message)}`;
-    window.open(url, '_blank');
+    window.open(url, '_blank', 'noopener,noreferrer');
     setToast('Opening WhatsApp with your enquiry...');
   };
 
@@ -138,24 +154,21 @@ export default function App() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#f8f9fb] text-[#0f2c4d] font-[Inter,system-ui,sans-serif] antialiased selection:bg-[#c9a86a]/30">
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap');
-        .serif { font-family: 'Instrument Serif', serif; }
-      `}</style>
+    <div className="site-shell min-h-screen bg-[#f8f9fb] text-[#0f2c4d] font-[Inter,system-ui,sans-serif] antialiased selection:bg-[#c9a86a]/30">
+      <a className="skip-link" href="#main-content">Skip to content</a>
 
       {/* Header */}
       <header className={`fixed top-0 w-full z-50 transition-all ${scrolled ? 'bg-white/95 backdrop-blur-xl shadow-[0_8px_30px_rgba(15,44,77,0.08)] py-3' : 'bg-white py-4 border-b border-[#0f2c4d]/[0.06]'}`}>
         <div className="mx-auto max-w-[1240px] px-5 md:px-8 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <button className="brand-home" onClick={() => scrollTo('home')} aria-label="Whiteline Uniforms home">
             <LogoMark className="h-7 w-auto text-[#0f2c4d]" />
-            <div className="leading-[1]">
-              <div className="font-bold text-[15px] tracking-[0.14em]">WHITELINE</div>
-              <div className="text-[10px] tracking-[0.22em] opacity-60 font-semibold -mt-[1px]">UNIFORMS</div>
-            </div>
-          </div>
+            <span className="leading-[1]">
+              <span className="block font-bold text-[15px] tracking-[0.14em]">WHITELINE</span>
+              <span className="block text-[10px] tracking-[0.22em] opacity-60 font-semibold mt-1">UNIFORMS</span>
+            </span>
+          </button>
 
-          <nav className="hidden md:flex items-center gap-8">
+          <nav aria-label="Main navigation" className="hidden lg:flex items-center gap-8">
             {[
               ['Home','home'],
               ['About','about'],
@@ -170,19 +183,19 @@ export default function App() {
             ))}
           </nav>
 
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden lg:flex items-center gap-3">
             <button onClick={()=>scrollTo('contact')} className="h-9 px-5 rounded-full bg-[#0f2c4d] text-white text-[13px] font-semibold tracking-[0.02em] hover:bg-[#163a64] transition-colors flex items-center gap-2">
               Get Quote <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
 
-          <button onClick={()=>setMobileOpen(v=>!v)} className="md:hidden w-9 h-9 rounded-full bg-[#0f2c4d] text-white grid place-items-center">
+          <button ref={menuButtonRef} onClick={()=>setMobileOpen(v=>!v)} aria-label={mobileOpen ? 'Close navigation' : 'Open navigation'} aria-expanded={mobileOpen} aria-controls="mobile-navigation" className="lg:hidden w-11 h-11 rounded-lg bg-[#0f2c4d] text-white grid place-items-center">
             {mobileOpen ? <X className="w-4 h-4"/> : <Menu className="w-4 h-4"/>}
           </button>
         </div>
 
         {mobileOpen && (
-          <div className="md:hidden bg-white border-t border-black/5 px-5 py-6 space-y-5">
+          <div id="mobile-navigation" className="lg:hidden bg-white border-t border-black/5 px-5 py-6 space-y-5 max-h-[calc(100dvh-80px)] overflow-y-auto">
             <div className="grid gap-4">
               {[
                 ['Home','home'],
@@ -199,14 +212,13 @@ export default function App() {
         )}
       </header>
 
+      <main id="main-content" tabIndex={-1}>
       {/* Hero */}
       <section id="home" className="pt-[88px] md:pt-[108px] bg-white overflow-hidden">
         <div className="mx-auto max-w-[1240px] px-5 md:px-8">
           <div className="grid md:grid-cols-[1.15fr_0.85fr] gap-10 md:gap-16 items-center py-10 md:py-16">
             <div>
-             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#f8f9fb] border border-[#0f2c4d]/10 text-[11px] font-semibold tracking-[0.12em] uppercase">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#c9a86a] animate-pulse" /> Supplying across Kerala • Pan-Kerala Delivery
-              </div>
+              <div className="hero-eyebrow">Made in Angamaly. Worn across Kerala.</div>
               <h1 className="serif mt-6 text-[38px] md:text-[58px] leading-[0.95] tracking-[-0.03em]">
                 Premium Uniforms<br/>
                 <span className="italic font-normal text-[#0f2c4d]/60">Tailored for</span><br/>
@@ -222,7 +234,7 @@ export default function App() {
                 <button onClick={()=>scrollTo('contact')} className="h-[44px] px-6 rounded-full border border-[#0f2c4d]/15 bg-white text-[14px] font-semibold hover:bg-[#f8f9fb] transition">Contact Us</button>
               </div>
 
-              <div className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-6 border-t border-[#0f2c4d]/10 pt-6">
+              <div className="hero-stats mt-10 grid grid-cols-2 xl:grid-cols-4 gap-6 border-t border-[#0f2c4d]/10 pt-6">
                 {[
                   {k:'10+', v:'Years Experience'},
                   {k:'50+', v:'Institutions Served'},
@@ -237,82 +249,7 @@ export default function App() {
               </div>
             </div>
 
-            {/* Hero visual */}
-            <div className="relative overflow-hidden md:overflow-visible">
-              <div className="relative aspect-[4/4.2] md:aspect-[4/4.6] rounded-[28px] overflow-hidden bg-[#f8f9fb] border border-[#0f2c4d]/10 p-3">
-                <div className="absolute inset-0 bg-[radial-gradient(120%_70%_at_80%_0%,rgba(201,168,106,0.22),transparent_60%),radial-gradient(90%_60%_at_10%_90%,rgba(15,44,77,0.12),transparent_60%)]" />
-                {/* Fabric rack mock */}
-                <div className="relative h-full w-full rounded-[20px] bg-white shadow-[0_20px_60px_rgba(15,44,77,0.12)] overflow-hidden flex flex-col">
-                  <div className="h-[46px] border-b border-black/5 flex items-center justify-between px-5">
-                    <div className="flex gap-1.5">
-                      <div className="w-2.5 h-2.5 rounded-full bg-[#0f2c4d]" />
-                      <div className="w-2.5 h-2.5 rounded-full bg-[#c9a86a]" />
-                      <div className="w-2.5 h-2.5 rounded-full bg-[#e5e7eb]" />
-                    </div>
-                    <div className="text-[10px] tracking-[0.18em] font-semibold opacity-50">WHITELINE ATELIER</div>
-                  </div>
-
-                  <div className="flex-1 grid grid-cols-[1fr_1fr] gap-0">
-                    <div className="border-r border-black/5 p-4 flex flex-col gap-4 bg-[#fbfaf7]">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[11px] font-bold tracking-[0.12em]">FABRIC SWATCHES</span>
-                        <Layers className="w-3.5 h-3.5 opacity-40" />
-                      </div>
-                      {[
-                        {c:'bg-[#0f2c4d]', n:'Navy Twill 240GSM'},
-                        {c:'bg-white border', n:'Poplin White'},
-                        {c:'bg-[#e8ddd0]', n:'Poly-Cotton Khaki'},
-                        {c:'bg-[#c9a86a]', n:'Gold Accent'},
-                      ].map((f,i)=>(
-                        <div key={i} className="flex items-center gap-3">
-                          <div className={`w-12 h-12 rounded-xl ${f.c} shadow-sm`} />
-                          <div>
-                            <div className="text-[12px] font-semibold">{f.n}</div>
-                            <div className="text-[10px] opacity-50">Premium • Breathable</div>
-                          </div>
-                        </div>
-                      ))}
-                      <div className="mt-auto rounded-xl bg-[#0f2c4d] text-white p-3 flex items-center gap-2">
-                        <BadgeCheck className="w-4 h-4 text-[#c9a86a]" />
-                        <span className="text-[11px] font-semibold">QC Passed • Lot #WL-284</span>
-                      </div>
-                    </div>
-
-                    <div className="p-4 flex flex-col">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[11px] font-bold tracking-[0.12em]">UNIFORM RACK</span>
-                        <Ruler className="w-3.5 h-3.5 opacity-40" />
-                      </div>
-                      <div className="mt-4 grid grid-cols-2 gap-3">
-                        {[
-                          {label:'School', color:'bg-[#0f2c4d]'},
-                          {label:'Medical', color:'bg-white border'},
-                          {label:'Nursing', color:'bg-[#fefefe] border'},
-                          {label:'Industrial', color:'bg-[#d8c4a6]'},
-                        ].map((u,i)=>(
-                          <div key={i} className="rounded-[14px] bg-[#f8f9fb] border border-black/[0.06] p-2.5">
-                            <div className={`h-[56px] rounded-[10px] ${u.color} relative overflow-hidden`}>
-                              <div className="absolute top-2 left-1/2 -translate-x-1/2 w-[42%] h-[5px] rounded-full bg-black/10" />
-                              <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent,rgba(0,0,0,0.06))]" />
-                            </div>
-                            <div className="mt-2 text-[11px] font-semibold tracking-[0.02em]">{u.label}</div>
-                            <div className="text-[10px] opacity-50">Ready stock</div>
-                          </div>
-                        ))}
-                      </div>
-                      <div className="mt-auto flex items-center gap-2 text-[11px]">
-                        <div className="w-7 h-7 rounded-full bg-[#c9a86a]/20 grid place-items-center"><Scissors className="w-3.5 h-3.5" /></div>
-                        <span className="opacity-70"><b className="text-[#0f2c4d]">Custom Embroidery</b> • Pan-Kerala Supply</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-
-              <div className="hidden md:block absolute -z-10 top-8 -right-8 w-[120px] h-[120px] rounded-full bg-[#c9a86a]/15 blur-[20px]" />
-              <div className="hidden md:block absolute -z-10 bottom-10 -left-10 w-[160px] h-[160px] rounded-full bg-[#0f2c4d]/10 blur-[24px]" />
-            </div>
+            <UniformIllustration />
           </div>
         </div>
       </section>
@@ -341,7 +278,7 @@ export default function App() {
                 We source premium poly-cotton, twill, drill and poplin fabrics directly from mills, maintain a steady stitching capacity of ~100 uniforms per day, and provide complete custom embroidery, logo printing and on-time delivery even for urgent academic season orders. No middlemen – factory direct with Pan-Kerala supply network.
               </p>
 
-              <div className="mt-8 grid md:grid-cols-3 gap-4">
+              <div className="about-features mt-8 grid gap-4">
                 {[
                   {icon: Layers, title:'Quality Fabric', desc:'Mills-direct poly-cotton, twill, drill. Color-fast, low-shrink, Kerala climate tested.'},
                   {icon: Scissors, title:'Perfect Stitching', desc:'Double-stitched seams, reinforced stress points, neat finishing – built for daily rough use.'},
@@ -376,16 +313,16 @@ export default function App() {
             <div className="text-[14px] opacity-60 max-w-[36ch]">Six dedicated lines. One quality promise. From LKG pinafores to OT scrubs and factory coveralls – all stitched in Angamaly.</div>
           </div>
 
-          <div className="mt-10 grid md:grid-cols-3 gap-5">
+          <div className="mt-10 grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {products.map((prod, idx) => (
-              <div key={idx} className="group rounded-[22px] border border-[#0f2c4d]/10 bg-[#fbfbfd] hover:bg-white hover:shadow-[0_18px_50px_rgba(15,44,77,0.08)] transition-all p-6 md:p-7">
+              <div key={idx} className="product-card group rounded-[22px] border border-[#0f2c4d]/10 bg-[#fbfbfd] hover:bg-white hover:shadow-[0_18px_50px_rgba(15,44,77,0.08)] transition-all p-6 md:p-7">
                 <div className="flex items-start justify-between">
                   <div className="w-11 h-11 rounded-[12px] bg-white border border-[#0f2c4d]/10 grid place-items-center shadow-sm group-hover:bg-[#0f2c4d] group-hover:text-white transition-colors">
                     <prod.icon className="w-5 h-5" />
                   </div>
                   <span className="text-[10px] font-bold tracking-[0.14em] px-2.5 py-1 rounded-full bg-[#0f2c4d]/5">0{idx+1}</span>
                 </div>
-                <div className="mt-5 font-semibold text-[17px] tracking-[-0.01em]">{prod.title}</div>
+                <h3 className="mt-5 font-semibold text-[17px] tracking-[-0.01em]">{prod.title}</h3>
                 <div className="mt-2 text-[13.5px] leading-[1.6] opacity-65">{prod.desc}</div>
                 <div className="mt-5 space-y-2.5">
                   {prod.bullets.map((b,i)=>(
@@ -398,8 +335,15 @@ export default function App() {
                 <div className="mt-6 h-px bg-[#0f2c4d]/10" />
                 <div className="mt-4 flex items-center gap-2 text-[12px] font-semibold tracking-[0.02em]">
                   <span className="opacity-60">Fabric:</span>
-                  <span className="px-2 py-1 rounded-full bg-white border text-[11px]">{idx<2 ? 'Poplin / Poly-Cotton' : idx===2 ? 'Twill / Drill 240GSM' : idx>2 ? 'Poly-Viscose / Cotton' : 'All options'}</span>
+                  <span className="px-2 py-1 rounded-full bg-white border text-[11px]">{idx<2 ? 'Poplin / Poly-Cotton' : idx===2 ? 'Twill / Drill 240GSM' : idx<5 ? 'Poly-Viscose / Cotton' : 'All options'}</span>
                 </div>
+                <button className="collection-enquiry" onClick={() => {
+                  const types = ['School Uniforms', 'College Uniforms', 'Industrial Uniforms', 'Doctor Coats/Scrubs', 'Nursing Uniforms', 'Others'];
+                  setForm(current => ({ ...current, type: types[idx] }));
+                  scrollTo('contact');
+                }} aria-label={`Enquire about ${prod.title}`}>
+                  Enquire about this collection <ArrowRight className="w-4 h-4 shrink-0" />
+                </button>
               </div>
             ))}
           </div>
@@ -446,13 +390,14 @@ export default function App() {
       </section>
 
       {/* Process */}
-      <section className="bg-[#f8f9fb] border-t border-[#0f2c4d]/5">
+      <section aria-labelledby="process-heading" className="process-section bg-[#f8f9fb] border-t border-[#0f2c4d]/5">
         <div className="mx-auto max-w-[1240px] px-5 md:px-8 py-16 md:py-20">
           <div className="flex items-center gap-3">
             <div className="h-px w-10 bg-[#0f2c4d]/20" />
             <div className="text-[11px] font-bold tracking-[0.18em] opacity-50">HOW WE WORK</div>
           </div>
-          <div className="mt-6 grid md:grid-cols-4 gap-4 relative">
+          <h2 id="process-heading" className="serif mt-4">From your first brief to the final stitch.</h2>
+          <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-4 gap-4 relative">
             <div className="hidden md:block absolute top-[34px] left-[10%] right-[10%] h-px bg-[#0f2c4d]/10" />
             {[
               {n:'01', t:'Consultation', d:'Share institution type, quantity, colors & logo. We advise fabric & costing.'},
@@ -494,22 +439,23 @@ export default function App() {
               <h2 className="serif mt-3 text-[34px] md:text-[44px] leading-[0.95] tracking-[-0.02em]">Let's stitch your<br/>institution's pride.</h2>
               <p className="mt-4 text-[14px] opacity-65 max-w-[44ch]">Tell us your requirement – we will send fabric swatches, costing and delivery timeline within 24 hours. Supplying throughout Kerala. Angamaly factory visit welcome.</p>
 
-              <form onSubmit={handleWhatsAppEnquiry} className="mt-8 grid gap-4">
+              <form onSubmit={handleWhatsAppEnquiry} className="quote-form mt-8 grid gap-5">
+                <p className="form-note">Fields marked * are required. Your enquiry opens in WhatsApp for you to review and send.</p>
                 <div className="grid md:grid-cols-2 gap-4">
                   <label className="grid gap-2">
                     <span className="text-[11px] font-bold tracking-[0.12em] opacity-60">YOUR NAME *</span>
-                    <input required value={form.name} onChange={e=>setForm({...form, name:e.target.value})} placeholder="Your Name" className="h-11 rounded-full border border-[#0f2c4d]/15 bg-[#f8f9fb] px-4 text-[14px] outline-none focus:border-[#0f2c4d] focus:bg-white transition" />
+                    <input required name="name" autoComplete="name" value={form.name} onChange={e=>setForm({...form, name:e.target.value})} placeholder="Your Name" className="h-11 rounded-full border border-[#0f2c4d]/15 bg-[#f8f9fb] px-4 text-[14px] outline-none focus:border-[#0f2c4d] focus:bg-white transition" />
                   </label>
                   <label className="grid gap-2">
                     <span className="text-[11px] font-bold tracking-[0.12em] opacity-60">INSTITUTION / ORGANIZATION *</span>
-                    <input required value={form.institution} onChange={e=>setForm({...form, institution:e.target.value})} placeholder="e.g., St. Mary's HSS, Lisie Hospital" className="h-11 rounded-full border border-[#0f2c4d]/15 bg-[#f8f9fb] px-4 text-[14px] outline-none focus:border-[#0f2c4d] focus:bg-white transition" />
+                    <input required name="organization" autoComplete="organization" value={form.institution} onChange={e=>setForm({...form, institution:e.target.value})} placeholder="e.g., St. Mary's HSS, Lisie Hospital" className="h-11 rounded-full border border-[#0f2c4d]/15 bg-[#f8f9fb] px-4 text-[14px] outline-none focus:border-[#0f2c4d] focus:bg-white transition" />
                   </label>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-4">
                   <label className="grid gap-2">
                     <span className="text-[11px] font-bold tracking-[0.12em] opacity-60">PHONE NUMBER *</span>
-                    <input required value={form.phone} onChange={e=>setForm({...form, phone:e.target.value})} placeholder="+91 92492 79111" type="tel" className="h-11 rounded-full border border-[#0f2c4d]/15 bg-[#f8f9fb] px-4 text-[14px] outline-none focus:border-[#0f2c4d] focus:bg-white transition" />
+                    <input required name="phone" autoComplete="tel" value={form.phone} onChange={e=>setForm({...form, phone:e.target.value})} placeholder="+91 92492 79111" type="tel" className="h-11 rounded-full border border-[#0f2c4d]/15 bg-[#f8f9fb] px-4 text-[14px] outline-none focus:border-[#0f2c4d] focus:bg-white transition" />
                   </label>
                   <label className="grid gap-2">
                     <span className="text-[11px] font-bold tracking-[0.12em] opacity-60">UNIFORM TYPE *</span>
@@ -544,7 +490,7 @@ export default function App() {
             </div>
 
             <div className="space-y-4">
-              <div className="rounded-[22px] bg-[#0f2c4d] text-white p-7 md:p-8 relative overflow-hidden">
+              <div className="contact-card rounded-[22px] bg-[#0f2c4d] text-white p-7 md:p-8 relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-[220px] h-[220px] bg-[#c9a86a]/20 blur-[30px] rounded-full" />
                 <div className="relative">
                   <div className="flex items-center gap-3">
@@ -604,12 +550,15 @@ export default function App() {
                     <div className="mt-2 text-[11px] opacity-80 leading-[1.5]">Cutting • Stitching • Embroidery<br/>QC • Packing – Supplying throughout Kerala</div>
                   </div>
                 </div>
-                <div className="mt-3 text-[11px] opacity-60 leading-[1.5]">Adam Bypass Complex, Opp. LF Hospital, M.C Road, Angamaly. Bulk buyers can check live production and fabric stock. Pan-Kerala delivery.</div>
+                <div className="mt-3 text-[13px] opacity-70 leading-[1.7]">Adam Bypass Complex, Opp. LF Hospital, M.C Road, Angamaly. Bulk buyers can check live production and fabric stock. Pan-Kerala delivery.</div>
+                <a className="directions-link" href="https://www.google.com/maps/search/?api=1&query=Whiteline+Uniforms+Adam+Bypass+Complex+Angamaly+Kerala+683572" target="_blank" rel="noopener noreferrer">Get directions <ArrowRight className="w-4 h-4" /></a>
               </div>
             </div>
           </div>
         </div>
       </section>
+
+      </main>
 
       {/* Footer */}
       <footer className="bg-[#0b1f36] text-white border-t border-white/5">
@@ -663,7 +612,7 @@ export default function App() {
 
       {/* Toast */}
       {toast && (
-        <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-[60] max-w-[90vw]">
+        <div role="status" aria-live="polite" className="fixed bottom-5 left-1/2 -translate-x-1/2 z-[60] w-max max-w-[90vw]">
           <div className="rounded-full bg-[#0f2c4d] text-white px-5 py-3 text-[13px] font-medium shadow-[0_16px_40px_rgba(0,0,0,0.2)] flex items-center gap-2">
             <BadgeCheck className="w-4 h-4 text-[#c9a86a]" /> {toast}
           </div>
